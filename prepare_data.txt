@@ -1,0 +1,97 @@
+
+
+# using LMDB
+
+* LMDB is Nosql database ,the base items in it is something like (key,str)
+
+```
+
+// examples of some base operations
+DataType data;
+
+// store info into data
+data.set_type()
+string out;
+data.SerializeToString(&out);
+scoped_ptr<db::DB> db(db::GetDB("LMDB"));
+db->Open(databasename,db::NEW);
+scoped_ptr<db::Transaction> txn(db->NewTransaction());
+txn->Put(key_str,out);
+// commit
+txn->Commit();
+// do next transaction
+txn.reset(db->NewTransaction());
+
+```
+
+# about detection
+1. read image data into anno_datum->mutable_datum(),note that datum is 4D tensor,
+datum has data and label properties
+```
+// -1 means the label is ignored(just for classification)
+bool status = ReadImageToDatum(filename, -1, height, width,
+                                 min_dim, max_dim, is_color, encoding,
+                                 anno_datum->mutable_datum());
+// name_to_label : map str(class name) to int
+bool ReadXMLToAnnotatedDatum(labelfile, ori_height, ori_width,
+                                       name_to_label, anno_datum);
+```
+
+2. parse xml file of annotations about one image(one annotation per image)
+
+# data argument
+
+1. substract mean
+2. flip
+3. resize
+4. random crop
+5. color distortion
+6. expansion(embed image into random image)
+# note that the bbox should be converted in the same way
+
+
+# PrefetchBaseDataLayer::BaseDataLayer,InternalThread
+prefetch_[PRETETCH_COUNTS]
+forward:
+// fetch data
+Batch<Dtype> batch = prefetch_full.pop()
+
+//used batch is pushed into free queue
+prefetch_free_.push(batch)
+
+//used for internal thread
+internalThreadEntry:
+```
+batch = prefetch_free.pop()
+load_batch(batch)
+```
+
+# BaseDataLayer
+LayerSetUp(){
+   data_transformer->reset();
+   //for special data(bbox for detection)
+   DataLayerSetUp(bottom,top);
+}
+
+# AnnotatedDataLayer
+DataLayerSetUp()
+dataum = read_.full().peek()
+```
+prefetch_[i].data_.reshape(top_data_shape)
+prefetch_[i].label_.reshape(top_label_shape)
+```
+
+load_batch()
+transformer_->DistortImage()
+transformer_->ExpandImage()
+GenerateBatchSamples()
+transformer_->CropImage()
+
+
+# LMDB format
+
+AnnotatedDatum(one annotation per image)
+Datum(image data)
+AnnotationGroup(per class)
+group_label
+annotation(one per bbox)

@@ -1,0 +1,61 @@
+
+calculate bbox(x,y,w,h) from predictions(t_x,t_y,t_w,t_h) of convolution
+
+b_x = (f(t_x)+c_x)/w
+b_y = (f(t_y)+c_y)/h
+b_w = p_w*exp(t_w)/w
+b_h = p_h*exp(t_h)/h
+
+where p_h and p_w are just anchors
+
+
+
+
+Region layer of darknet
+some statics valuable:
+
+avg_iou: just for fg
+recall: iou>0.5
+avg_cat
+avg_obj: avg of objectness prior for fg
+avg_anyobj: avg of objectness prior for any bbox
+rescore: using iou to replace objectness gt
+1. activate predict using logistic function
+
+loss function of yolo
+
+
+# forward
+
+two loops ,one for predictions ,the other for groundtruth
+
+1. loop for predictions
+find gt_box that is the best matched with bbox
+calculate the objectness of bbox
+(note that in the begining force all box match with standard anchors,
+it may be better for converage)
+
+2. loop for gt
+
+determinate if it is fg or bg using iou according to bias_match
+if it is fg ,objectness should be forecd to 1, otherwise it should be 0.
+
+for fg:
+    objectness is 1(or iou if rescore)
+    classes: classes_gt
+    bbox: bbox_gt
+
+for bg
+    objectness is 0
+
+
+# backward
+all is least square loss
+so get the delta of gt and pred
+
+loss = ||delta||^2
+grad = delta
+
+for t_x and t_y
+grad = delta*logistic'(x)
+

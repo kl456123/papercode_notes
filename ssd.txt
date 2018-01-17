@@ -1,0 +1,72 @@
+
+
+
+
+multibox_loss_layer
+bottom[0] mbox_loc
+bottom[1] mbox_conf
+bottom[2] mbox_prior_box
+bottom[3] label(1,1,11,8)
+:item_id,label,instance_id,xmin,ymin,xmax,ymax,difficult
+
+LayerSetUp:
+setup localization loss layer(smooth_L1)
+setup confidence loss layer(softmaxloss)
+
+
+
+Reshape
+
+1. GetGroundTruth():
+all_gt_bboxes: map<int,vector<NormalizedBBox> >
+(*all_gt_bboxes)[item_id].push_back(bbox);
+
+2. GerPriorBBoxes():
+prior_bboxes:vector<NormalizedBBox>*
+prior_variances:vector<vector<float> >*
+
+3. GetLocPredictions():
+Retrieve all localization predictions from loc_data
+all_loc_pred format: vector<LabelBox>
+labelbox : separate bbox in one image by classes
+but by default we dont do this !
+
+```
+label=-1(for share)
+label_bbox[label][p]
+```
+
+
+
+4. FindMatch()
+all_match_indices: vector<map<int,vector<float> > >(for each label and each image)
+MatchType:
+1. BIPARTITE(二分匹配,互斥)
+2. PER_PREDICTION(保证每一个预测值有匹配)
+
+5. MineHardExamples
+
+ComputeConfLoss: aim to calculate conf loss when its label is background
+all_conf_loss: vector<vector<float> >* shape(num,num_preds_per_class)
+loss_indices: vector<pair<float, int> >: get potential indices and loss pair
+all_neg_indices
+
+
+6. loc_loss_layer forward
+//positive samples
+all matched bbox push into loc_loss_layer
+form data to pass on to loc_loss_layer
+EncodeLocPrediction
+EncodeBBox
+code_type
+encode_variance_in_target
+g_x = (g_x-d_x)/d_w/variance
+g_w = log(g_w/d_w)
+encode_box
+
+7. conf_loss_layer forward
+form data to pass on to conf_loss_layer
+EncodeConfPrediction
+
+8. calculate loss
+top[0] = loc_weight_ * loc_loss_ + conf_loss_
