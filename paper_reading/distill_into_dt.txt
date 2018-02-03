@@ -1,0 +1,15 @@
+########################################
+##########distill into a decition tree##
+########################################
+
+
+
+
+
+
+overfit:
+    typical node at the lower levels of a decision tree is only
+used by a very small fraction of the training data
+
+
+

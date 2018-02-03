@@ -1,0 +1,56 @@
+#######################################################
+##########code comment about paper ####################
+#######################################################
+
+
+
+1. conv_feat is shared feat between rpn and rcnn head
+2. use conv5 to do PSROIPooling
+3. get rpn_cls_prob and rpn_bbox_loss from rpn
+
+rpn_bbox_target is diff between anchors and gt_boxes
+rpn_bbox_pred is the output of rpn
+rpn_bbox_weight is weights of coordination
+    rpn_bbox_loss = smoothL1(rpn_bbox_weight*(rpn_bbox_target - rpn_bbox_pred))
+
+rpn_label is 2 classes(object and noobject)
+    rpn_cls_prob = softmax(rpn_cls_score,rpn_label)
+
+4. get cls_prob and bbox_loss from PSROIPooling,
+cls_prob is result of softmaxoutput for multiple classes
+label is classes of all objects
+cls_score is the result before normalization
+    cls_prob = softmax(cls_score,label)
+
+bbox_target is diff between rois and gt_boxes
+bbox_weight is weights of every coordinations in bbox
+    bbox_loss = smoothL1(bbox_weight*(bbox_target - bbox_pred))
+
+so the final bbox coordination is bbox_transform(bbox_pred+roi)
+
+match_policy:
+    depend on roi or anchor IOU?
+ans: the first time it depends on anchor
+    the second time it depends on proposal(RoI)
+
+
+    detection framework
+
+  base conv network
+        .
+        .
+        .
+    conv_feat
+        .   .
+        .       .
+    |Deformable|    .
+    |   conv   |       RPN
+        .           .      .
+        .   |bbox_prob | cls_prob|
+        .   .
+        .   |roi|
+        .   .
+        .   .
+    |PSROIPooling|
+        .   .   .
+    |bbox||cls||rois|

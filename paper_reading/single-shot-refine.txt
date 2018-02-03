@@ -1,0 +1,39 @@
+#############################
+#########object detection####
+#############################
+
+
+# key point
+
+ARM(anchor refine module) and ODM(object detection module)
+
+
+propose of ARM :
+    1. remove negaive anchors so as to reduce search space
+    2. coarsely adjust the locations and sizes of anchors
+
+
+propose of ODM :
+    1. regress accurate object locations and predict multi-class labels
+    based on the refined anchors
+
+
+three core components :
+    1. transfer connection block(TCB)
+    2. two-step cascaded regression
+    3. negative anchor filtering, early rejecting well-classified negative anchors
+    and mitigate the imbalance issue
+
+feature of TCB :
+    1. convert features of different layers from the ARM , into the form required by the ODM
+    2. integrate large-scale context by adding the high level features(Top-down addition)
+
+Two-Step Cascaded Regression
+
+Negative Anchor Filtering
+
+Anchors Design and Matching
+
+Hard Negative Mining :
+    select some nagetive anchor boxes with top loss values to make the ratio between the negatives
+    and positives below 3:1(like SSD)

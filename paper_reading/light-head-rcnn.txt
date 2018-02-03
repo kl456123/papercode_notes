@@ -1,0 +1,13 @@
+################################
+#####object detection###########
+################################
+
+
+
+Thin feature maps :
+    large separable convolution performs a kx1 and 1xk
+    convolution sequentially.
+
+
+
+R-CNN subnet

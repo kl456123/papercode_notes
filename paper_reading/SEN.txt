@@ -1,0 +1,34 @@
+###################################
+######sequeeze-excitation-network##
+###################################
+
+
+
+assumption:
+    use channel attention to noise
+    lower layer is unable to exploit contexual information outside of this region
+
+
+SE building block:
+    sequeeze:
+    global information embedding
+    use global average pooling to generate channel-wise statistic
+
+
+    excitation:
+    adaptive recalibration
+    model which aims to fully capture channel-wise dependencies
+    gating mechanism with a sigmoid activation
+
+    formulation:
+    s = F_ex(z,W) = sigmoid(W2*relu(W1*z))
+
+    W2 and W1 to form a bottleneck to limit model complexity and\
+    aid generalisation
+
+    output = F_scale(u_c,s_c) = s_c*u_c
+    scale in channel-wise
+
+Note:
+    In later layers SE blocks becomes increasingly specialised , and responds
+    to different inputs in a highly class-specific manner

@@ -1,0 +1,71 @@
+
+
+
+base_symbol
+    1.compose multiple symbol into one symbol
+2.creator (Activation Operator of Neural Net)
+
+    symbol
+    1.var
+
+    base_model
+    1.logger
+    2.binded
+    3.for_training
+    4.inputs_need_grad
+    5.params_initialized
+    6._symbol
+
+    high level API
+forward_backward(data_batch)
+
+
+    model
+    args:context    mx.cpu() or mx.gpu() or array
+    work_load_list     each num in list means pro in one batch_size
+    1._grad_req
+    2._exec_group
+
+
+    arg_names:
+    1.input_names:
+    data_names,label_names,state_names
+    2.param_names
+
+
+
+model.fit(train_data,eval_data,initializer,arg_params,aux_params,
+        begin_epoch,num_epoch,eval_metric,validation_metric)
+
+    1. bind executor using shape
+    parse_to_Desc
+    bind to exec_group
+
+    2.init_params
+
+    3.init_optimizer
+
+    executor_group
+    grad_req :if symbol need backward
+    layout: means axis refers to batch_size
+
+
+    optimizer
+    create_optimizer :name (type of optimizer), optimizer_params, param_idx2name
+
+
+    metric
+    create: name(type of metric)
+
+
+    note that
+    1.arguments can be either as positional or keyword, not both
+    2.each symbol has a handle(pointer) to connect with c++ object
+    3.all forward and backward calculation are done in executor
+    4.update on different dev and different param
+
+
+    some help function:
+
+    _split_input_slice
+    _load_data load data into slice arrays
