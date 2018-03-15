@@ -1,0 +1,28 @@
+
+
+the most important function:
+im_detect
+
+
+roidb:
+some image names and gt_boxes
+
+feed roidb to roi_data_layer
+generate blobs(tensor) for net from roidb
+blob{
+    'data':im(read by cv2.read(im_name))
+    'roi':gt_boxes
+    'im_info':scales
+}
+
+
+solverWrapper class
+sw.train_model
+
+
+# imdb
+subclasses :pascal_voc
+            coco
+
+
+
